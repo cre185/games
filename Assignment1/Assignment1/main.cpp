@@ -19,28 +19,52 @@ Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos)
     return view;
 }
 
-Eigen::Matrix4f get_model_matrix(float rotation_angle)
+Eigen::Matrix4f get_model_matrix(float x_angle, float y_angle, float z_angle)
 {
-    Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
-
+    /*
+    about the three axis:
+    the two axis parallel to screen will be:
+        ^y
+        |
+    ----|--->x
+        |
+    and axis z vertical to your screen.
+    the three angle represents the rotation angle around each axis.
+    */
     // TODO: Implement this function
     // Create the model matrix for rotating the triangle around the Z axis.
     // Then return it.
-    float cos_angle = cos(rotation_angle / 180 * MY_PI);
-    float sin_angle = sin(rotation_angle / 180 * MY_PI);
-    model << cos_angle, -sin_angle, 0, 0, 
+    Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
+    float cos_angle = cos(x_angle / 180 * MY_PI);
+    float sin_angle = sin(x_angle / 180 * MY_PI);
+    model << 1, 0, 0, 0, 
+             0, cos_angle, -sin_angle, 0,
+             0, sin_angle, cos_angle, 0,
+             0, 0, 0, 1;
+
+    Eigen::Matrix4f model2 = Eigen::Matrix4f::Identity();
+    cos_angle = cos(y_angle / 180 * MY_PI);
+    sin_angle = sin(y_angle / 180 * MY_PI);
+    model2 << cos_angle, 0, sin_angle, 0, 
+             0, 1, 0, 0,
+             -sin_angle, 0, cos_angle, 0,
+             0, 0, 0, 1;
+
+    Eigen::Matrix4f model3 = Eigen::Matrix4f::Identity();
+    cos_angle = cos(z_angle / 180 * MY_PI);
+    sin_angle = sin(z_angle / 180 * MY_PI);
+    model3 << cos_angle, -sin_angle, 0, 0, 
              sin_angle, cos_angle, 0, 0,
              0, 0, 1, 0,
              0, 0, 0, 1;
 
-    return model;
+    // std::cout<<model<<std::endl<<model2<<std::endl<<model3<<std::endl;
+    return model * model2 * model3;
 }
 
 Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
                                       float zNear, float zFar)
 {
-    // Students will implement this function
-
     Eigen::Matrix4f projection = Eigen::Matrix4f::Identity();
 
     // TODO: Implement this function
@@ -98,13 +122,15 @@ Eigen::Matrix4f get_rotation(Vector3f axis, float angle)
 
 int main(int argc, const char** argv)
 {
-    float angle = 0;
+    float x_angle = 0;
+    float y_angle = 0;
+    float z_angle = 0;
     bool command_line = false;
     std::string filename = "output.png";
 
     if (argc >= 3) {
         command_line = true;
-        angle = std::stof(argv[2]); // -r by default
+        x_angle = std::stof(argv[2]); // -r by default
         if (argc == 4) {
             filename = std::string(argv[3]);
         }
@@ -112,7 +138,7 @@ int main(int argc, const char** argv)
 
     rst::rasterizer r(700, 700);
 
-    Eigen::Vector3f eye_pos = {0, 0, 5};
+    Eigen::Vector3f eye_pos = {0, 0, 8};
 
     std::vector<Eigen::Vector3f> pos{{2, 0, -2}, {0, 2, -2}, {-2, 0, -2}};
 
@@ -127,7 +153,7 @@ int main(int argc, const char** argv)
     if (command_line) {
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
 
-        r.set_model(get_model_matrix(angle));
+        r.set_model(get_model_matrix(x_angle, y_angle, z_angle));
         r.set_view(get_view_matrix(eye_pos));
         r.set_projection(get_projection_matrix(45, 1, 0.1, 50));
 
@@ -143,7 +169,7 @@ int main(int argc, const char** argv)
     while (key != 27) {
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
 
-        r.set_model(get_model_matrix(angle));
+        r.set_model(get_model_matrix(x_angle, y_angle, z_angle));
         r.set_view(get_view_matrix(eye_pos));
         r.set_projection(get_projection_matrix(45, 1, 0.1, 50));
 
@@ -156,13 +182,24 @@ int main(int argc, const char** argv)
 
         std::cout << "frame count: " << frame_count++ << '\n';
 
-        if (key == 'a') {
-            angle += 10;
+        if (key == 'q') {
+            x_angle += 10;
+        }
+        else if (key == 'a') {
+            x_angle -= 10;
+        }
+        else if (key == 'w') {
+            y_angle += 10;
+        }
+        else if (key == 's') {
+            y_angle -= 10;
+        }
+        else if (key == 'e') {
+            z_angle += 10;
         }
         else if (key == 'd') {
-            angle -= 10;
+            z_angle -= 10;
         }
     }
-
     return 0;
 }

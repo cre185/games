@@ -1,0 +1,16 @@
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: /home/cs18/GAMES101/homework/Assignment3/Code/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_501c7/fast"
+make: Warning: File 'Makefile' has modification time 33 s in the future
+/usr/bin/make -f CMakeFiles/cmTC_501c7.dir/build.make CMakeFiles/cmTC_501c7.dir/build
+make[1]: Entering directory '/home/cs18/GAMES101/homework/Assignment3/Code/build/CMakeFiles/CMakeTmp'
+CMakeFiles/cmTC_501c7.dir/build.make:55: CMakeFiles/cmTC_501c7.dir/depend.make: No such file or directory
+make[1]: Warning: File 'CMakeFiles/cmTC_501c7.dir/flags.make' has modification time 33 s in the future
+make[1]: *** No rule to make target 'CMakeFiles/cmTC_501c7.dir/depend.make'.  Stop.
+make[1]: Leaving directory '/home/cs18/GAMES101/homework/Assignment3/Code/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_501c7/fast' failed
+make: *** [cmTC_501c7/fast] Error 2
+
+
+

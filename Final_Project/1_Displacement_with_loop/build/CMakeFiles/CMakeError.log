@@ -1,0 +1,14 @@
+Detecting CXX [-std=c++11] compiler features failed to compile with the following output:
+Change Dir: /home/cs18/GAMES101/homework/Final_Project/1_Displacement_with_loop/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_29de0/fast"
+/usr/bin/make -f CMakeFiles/cmTC_29de0.dir/build.make CMakeFiles/cmTC_29de0.dir/build
+make[1]: Entering directory '/home/cs18/GAMES101/homework/Final_Project/1_Displacement_with_loop/build/CMakeFiles/CMakeTmp'
+CMakeFiles/cmTC_29de0.dir/build.make:55: CMakeFiles/cmTC_29de0.dir/depend.make: No such file or directory
+make[1]: *** No rule to make target 'CMakeFiles/cmTC_29de0.dir/depend.make'.  Stop.
+make[1]: Leaving directory '/home/cs18/GAMES101/homework/Final_Project/1_Displacement_with_loop/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_29de0/fast' failed
+make: *** [cmTC_29de0/fast] Error 2
+
+
+

@@ -1,0 +1,186 @@
+Detecting C [-std=c99] compiler features failed to compile with the following output:
+Change Dir: /home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_426ef/fast"
+make: Warning: File 'Makefile' has modification time 33 s in the future
+/usr/bin/make -f CMakeFiles/cmTC_426ef.dir/build.make CMakeFiles/cmTC_426ef.dir/build
+make[1]: Entering directory '/home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp'
+CMakeFiles/cmTC_426ef.dir/build.make:58: CMakeFiles/cmTC_426ef.dir/progress.make: No such file or directory
+make[1]: Warning: File 'CMakeFiles/cmTC_426ef.dir/flags.make' has modification time 33 s in the future
+make[1]: *** No rule to make target 'CMakeFiles/cmTC_426ef.dir/progress.make'.  Stop.
+make[1]: Leaving directory '/home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_426ef/fast' failed
+make: *** [cmTC_426ef/fast] Error 2
+
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: /home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_ec6d9/fast"
+make: Warning: File 'Makefile' has modification time 33 s in the future
+/usr/bin/make -f CMakeFiles/cmTC_ec6d9.dir/build.make CMakeFiles/cmTC_ec6d9.dir/build
+make[1]: Entering directory '/home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp'
+CMakeFiles/cmTC_ec6d9.dir/build.make:58: CMakeFiles/cmTC_ec6d9.dir/progress.make: No such file or directory
+make[1]: Warning: File 'CMakeFiles/cmTC_ec6d9.dir/flags.make' has modification time 33 s in the future
+make[1]: *** No rule to make target 'CMakeFiles/cmTC_ec6d9.dir/progress.make'.  Stop.
+make[1]: Leaving directory '/home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_ec6d9/fast' failed
+make: *** [cmTC_ec6d9/fast] Error 2
+
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_97505/fast"
+make: Warning: File 'Makefile' has modification time 33 s in the future
+/usr/bin/make -f CMakeFiles/cmTC_97505.dir/build.make CMakeFiles/cmTC_97505.dir/build
+make[1]: Entering directory '/home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp'
+make[1]: Warning: File 'CMakeFiles/cmTC_97505.dir/flags.make' has modification time 33 s in the future
+Building C object CMakeFiles/cmTC_97505.dir/CheckSymbolExists.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_97505.dir/CheckSymbolExists.c.o   -c /home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_97505
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_97505.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_97505.dir/CheckSymbolExists.c.o  -o cmTC_97505 
+CMakeFiles/cmTC_97505.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x1b): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_97505.dir/build.make:97: recipe for target 'cmTC_97505' failed
+make[1]: *** [cmTC_97505] Error 1
+make[1]: Leaving directory '/home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_97505/fast' failed
+make: *** [cmTC_97505/fast] Error 2
+
+File /home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f2afc/fast"
+make: Warning: File 'Makefile' has modification time 33 s in the future
+/usr/bin/make -f CMakeFiles/cmTC_f2afc.dir/build.make CMakeFiles/cmTC_f2afc.dir/build
+make[1]: Entering directory '/home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp'
+make[1]: Warning: File 'CMakeFiles/cmTC_f2afc.dir/flags.make' has modification time 33 s in the future
+Building C object CMakeFiles/cmTC_f2afc.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_f2afc.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.10/Modules/CheckFunctionExists.c
+Linking C executable cmTC_f2afc
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f2afc.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_f2afc.dir/CheckFunctionExists.c.o  -o cmTC_f2afc -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_f2afc.dir/build.make:97: recipe for target 'cmTC_f2afc' failed
+make[1]: *** [cmTC_f2afc] Error 1
+make[1]: Leaving directory '/home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_f2afc/fast' failed
+make: *** [cmTC_f2afc/fast] Error 2
+
+
+Determining if the function XOpenDisplay exists in the /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so failed with the following output:
+Change Dir: /home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1bb74/fast"
+make: *** No rule to make target 'cmTC_1bb74/fast'.  Stop.
+
+
+Determining if the function dnet_ntoa exists in the dnet failed with the following output:
+Change Dir: /home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_67d02/fast"
+make: Warning: File 'Makefile' has modification time 33 s in the future
+/usr/bin/make -f CMakeFiles/cmTC_67d02.dir/build.make CMakeFiles/cmTC_67d02.dir/build
+make[1]: Entering directory '/home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp'
+make[1]: Warning: File 'CMakeFiles/cmTC_67d02.dir/flags.make' has modification time 33 s in the future
+Building C object CMakeFiles/cmTC_67d02.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=dnet_ntoa   -o CMakeFiles/cmTC_67d02.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.10/Modules/CheckFunctionExists.c
+Linking C executable cmTC_67d02
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_67d02.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=dnet_ntoa    -rdynamic CMakeFiles/cmTC_67d02.dir/CheckFunctionExists.c.o  -o cmTC_67d02 -ldnet 
+/usr/bin/ld: cannot find -ldnet
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_67d02.dir/build.make:97: recipe for target 'cmTC_67d02' failed
+make[1]: *** [cmTC_67d02] Error 1
+make[1]: Leaving directory '/home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_67d02/fast' failed
+make: *** [cmTC_67d02/fast] Error 2
+
+
+Determining if the function dnet_ntoa exists in the dnet_stub failed with the following output:
+Change Dir: /home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_3c6ee/fast"
+make: Warning: File 'Makefile' has modification time 33 s in the future
+/usr/bin/make -f CMakeFiles/cmTC_3c6ee.dir/build.make CMakeFiles/cmTC_3c6ee.dir/build
+make[1]: Entering directory '/home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp'
+make[1]: Warning: File 'CMakeFiles/cmTC_3c6ee.dir/flags.make' has modification time 33 s in the future
+Building C object CMakeFiles/cmTC_3c6ee.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=dnet_ntoa   -o CMakeFiles/cmTC_3c6ee.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.10/Modules/CheckFunctionExists.c
+Linking C executable cmTC_3c6ee
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3c6ee.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=dnet_ntoa    -rdynamic CMakeFiles/cmTC_3c6ee.dir/CheckFunctionExists.c.o  -o cmTC_3c6ee -ldnet_stub 
+/usr/bin/ld: cannot find -ldnet_stub
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_3c6ee.dir/build.make:97: recipe for target 'cmTC_3c6ee' failed
+make[1]: *** [cmTC_3c6ee] Error 1
+make[1]: Leaving directory '/home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_3c6ee/fast' failed
+make: *** [cmTC_3c6ee/fast] Error 2
+
+
+Determining if the function shmat exists failed with the following output:
+Change Dir: /home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_9efbe/fast"
+make: Warning: File 'Makefile' has modification time 33 s in the future
+/usr/bin/make -f CMakeFiles/cmTC_9efbe.dir/build.make CMakeFiles/cmTC_9efbe.dir/build
+make[1]: Entering directory '/home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp'
+CMakeFiles/cmTC_9efbe.dir/build.make:58: CMakeFiles/cmTC_9efbe.dir/progress.make: No such file or directory
+make[1]: Warning: File 'CMakeFiles/cmTC_9efbe.dir/flags.make' has modification time 33 s in the future
+make[1]: *** No rule to make target 'CMakeFiles/cmTC_9efbe.dir/progress.make'.  Stop.
+make[1]: Leaving directory '/home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_9efbe/fast' failed
+make: *** [cmTC_9efbe/fast] Error 2
+
+
+Determining if the function shmat exists in the ipc failed with the following output:
+Change Dir: /home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f70b6/fast"
+make: Warning: File 'Makefile' has modification time 33 s in the future
+/usr/bin/make -f CMakeFiles/cmTC_f70b6.dir/build.make CMakeFiles/cmTC_f70b6.dir/build
+make[1]: Entering directory '/home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp'
+make[1]: Warning: File 'CMakeFiles/cmTC_f70b6.dir/flags.make' has modification time 33 s in the future
+Building C object CMakeFiles/cmTC_f70b6.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat   -o CMakeFiles/cmTC_f70b6.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.10/Modules/CheckFunctionExists.c
+Linking C executable cmTC_f70b6
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f70b6.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=shmat    -rdynamic CMakeFiles/cmTC_f70b6.dir/CheckFunctionExists.c.o  -o cmTC_f70b6 -lipc 
+/usr/bin/ld: cannot find -lipc
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_f70b6.dir/build.make:97: recipe for target 'cmTC_f70b6' failed
+make[1]: *** [cmTC_f70b6] Error 1
+make[1]: Leaving directory '/home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_f70b6/fast' failed
+make: *** [cmTC_f70b6/fast] Error 2
+
+
+Determining if the function glXGetProcAddressEXT exists failed with the following output:
+Change Dir: /home/cs18/GAMES101/homework/Assignment8/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1992f/fast"
+make: *** No rule to make target 'cmTC_1992f/fast'.  Stop.
+
+

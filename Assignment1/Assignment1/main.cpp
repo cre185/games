@@ -13,8 +13,6 @@ typedef struct RotAngle{
 } RotAngle;
 RotAngle view_rot, model_rot;
 
-int last_x = -1;
-int last_y = -1;
 float rot_sensitivity = 0.3f;
 float mov_sensitivity = 0.3f;
 
@@ -82,6 +80,24 @@ Eigen::Matrix4f rotate_matrix(RotAngle &angle){
     return x_rotate_matrix(angle.x_angle)*y_rotate_matrix(angle.y_angle)*z_rotate_matrix(angle.z_angle);
 }
 
+Eigen::Matrix4f get_model_matrix(RotAngle &angle)
+{
+    /*
+    about the three axis:
+    the two axis parallel to screen will be:
+        ^y
+        |
+    ----|--->x
+        |
+    and axis z vertical to your screen.
+    the three angle represents the rotation angle around each axis.
+    */
+    // TODO: Implement this function
+    // Create the model matrix for rotating the triangle around the Z axis.
+    // Then return it.
+    return rotate_matrix(angle);
+}
+
 Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos, RotAngle &angle)
 {
     Eigen::Matrix4f all_rotation = rotate_matrix(angle);
@@ -100,24 +116,6 @@ Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos, RotAngle &angle)
     
     view = view * translate;
     return view;
-}
-
-Eigen::Matrix4f get_model_matrix(RotAngle &angle)
-{
-    /*
-    about the three axis:
-    the two axis parallel to screen will be:
-        ^y
-        |
-    ----|--->x
-        |
-    and axis z vertical to your screen.
-    the three angle represents the rotation angle around each axis.
-    */
-    // TODO: Implement this function
-    // Create the model matrix for rotating the triangle around the Z axis.
-    // Then return it.
-    return rotate_matrix(angle);
 }
 
 Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
@@ -159,17 +157,28 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
 
 
 void on_Mouse(int event, int x, int y, int flags, void* param) {
+    static bool mouse_down=false;
+    static int last_x = 0;
+    static int last_y = 0;
 	if (event == CV_EVENT_MOUSEMOVE){
-        if(last_x!=-1 || last_y!=-1){
+        if(mouse_down){
             float delta_x = (x-last_x)*rot_sensitivity;
             float delta_y = (y-last_y)*rot_sensitivity;
             // remind the difference between rotation using x axis and rotating in the x direction:
             // rotate around x axis makes your view move upwards/downwards
             view_rot.y_angle -= delta_x;
             view_rot.x_angle -= delta_y;
+            last_x=x;
+            last_y=y;
         }
+    }
+    else if (event == CV_EVENT_LBUTTONDOWN){
+        mouse_down=true;
         last_x=x;
         last_y=y;
+    }
+    else if (event == CV_EVENT_LBUTTONUP){
+        mouse_down=false;
     }
 }
 

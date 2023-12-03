@@ -7,17 +7,13 @@
 
 constexpr double MY_PI = 3.1415926;
 
-typedef struct RotAngle{
-    float x_angle = 0;
-    float y_angle = 0;
-    float z_angle = 0;
-} RotAngle;
-RotAngle view_rot, model_rot;
+Eigen::Vector4f view_rot = {0, 0, 0, 0};
+Eigen::Vector4f model_rot = {0, 0, 0, 0};
 
 float rot_sensitivity = 0.3f;
 float mov_sensitivity = 0.3f;
 
-Eigen::Vector3f eye_pos = {0, 0, 8};
+Eigen::Vector4f eye_pos = {0, 0, 8, 1};
 Eigen::Vector4f eye_dir = {0, 0, -1, 0}; // -z
 Eigen::Vector4f up_dir = {0, 1, 0, 0}; // y
 Eigen::Vector4f right_dir = {1, 0, 0, 0}; // x
@@ -55,11 +51,11 @@ Eigen::Matrix4f z_rotate_matrix(float z_angle){
     return model;
 }
 
-Eigen::Matrix4f rotate_matrix(RotAngle &angle){
-    return x_rotate_matrix(angle.x_angle)*y_rotate_matrix(angle.y_angle)*z_rotate_matrix(angle.z_angle);
+Eigen::Matrix4f rotate_matrix(Vector4f &angle){
+    return x_rotate_matrix(angle[0])*y_rotate_matrix(angle[1])*z_rotate_matrix(angle[2]);
 }
 
-Eigen::Matrix4f get_model_matrix(RotAngle &angle)
+Eigen::Matrix4f get_model_matrix(Vector4f &angle)
 {
     /*
     about the three axis:
@@ -77,7 +73,7 @@ Eigen::Matrix4f get_model_matrix(RotAngle &angle)
     return rotate_matrix(angle);
 }
 
-Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos, RotAngle &angle)
+Eigen::Matrix4f get_view_matrix(Vector4f &eye_pos, Vector4f &angle)
 {
     Eigen::Matrix4f all_rotation = rotate_matrix(angle);
     Eigen::Vector4f a = all_rotation*right_dir;
@@ -136,12 +132,13 @@ void on_Mouse(int event, int x, int y, int flags, void* param) {
     static int last_y = 0;
 	if (event == CV_EVENT_MOUSEMOVE){
         if(mouse_down){
-            float delta_x = (x-last_x)*rot_sensitivity;
-            float delta_y = (y-last_y)*rot_sensitivity;
             // remind the difference between rotation using x axis and rotating in the x direction:
             // rotate around x axis makes your view move upwards/downwards
-            view_rot.y_angle -= delta_x;
-            view_rot.x_angle -= delta_y;
+            float delta_y = (last_x-x)*rot_sensitivity;
+            float delta_x = (last_y-y)*rot_sensitivity;
+            Eigen::Matrix4f all_rotation = rotate_matrix(view_rot);
+            view_rot[0] += (all_rotation*right_dir*delta_x)[0];
+            view_rot[1] += (all_rotation*up_dir*delta_y)[1];
             last_x=x;
             last_y=y;
         }
@@ -169,9 +166,6 @@ int main(int argc, const char** argv)
 
     rst::rasterizer r(700, 700);
 
-    Eigen::Vector3f eye_pos = {0,0,12};
-
-
     std::vector<Eigen::Vector3f> pos
             {
                     {2, 0, -2},
@@ -185,7 +179,9 @@ int main(int argc, const char** argv)
     std::vector<Eigen::Vector3i> ind
             {
                     {0, 1, 2},
-                    {3, 4, 5}
+                    {2, 1, 0},
+                    {3, 4, 5},
+                    {5, 4, 3}
             };
 
     std::vector<Eigen::Vector3f> cols
@@ -242,23 +238,19 @@ int main(int argc, const char** argv)
 
         if (key == 'w') {
             Vector4f current_dir = rotate_matrix(view_rot)*eye_dir;
-            Vector3f dir = {current_dir[0], current_dir[1], current_dir[2]};
-            eye_pos += dir*mov_sensitivity;
+            eye_pos += current_dir*mov_sensitivity;
         }
         else if (key == 's') {
             Vector4f current_dir = rotate_matrix(view_rot)*eye_dir;
-            Vector3f dir = {current_dir[0], current_dir[1], current_dir[2]};
-            eye_pos -= dir*mov_sensitivity;
+            eye_pos -= current_dir*mov_sensitivity;
         }
         else if (key == 'a') {
             Vector4f current_dir = rotate_matrix(view_rot)*right_dir;
-            Vector3f dir = {current_dir[0], current_dir[1], current_dir[2]};
-            eye_pos -= dir*mov_sensitivity;
+            eye_pos -= current_dir*mov_sensitivity;
         }
         else if (key == 'd') {
             Vector4f current_dir = rotate_matrix(view_rot)*right_dir;
-            Vector3f dir = {current_dir[0], current_dir[1], current_dir[2]};
-            eye_pos += dir*mov_sensitivity;
+            eye_pos += current_dir*mov_sensitivity;
         }
     }
     return 0;

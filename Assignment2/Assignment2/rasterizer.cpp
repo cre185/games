@@ -88,10 +88,14 @@ void rst::rasterizer::draw(pos_buf_id pos_buffer, ind_buf_id ind_buffer, col_buf
                 mvp * to_vec4(buf[i[1]], 1.0f),
                 mvp * to_vec4(buf[i[2]], 1.0f)
         };
+        // Ignore triangles behind the view
+        bool behind = false;
         //Homogeneous division
         for (auto& vec : v) {
+            if(vec.w()>=0) behind=true;
             vec /= vec.w();
         }
+        if(behind) continue;
         //Viewport transformation
         for (auto & vert : v)
         {

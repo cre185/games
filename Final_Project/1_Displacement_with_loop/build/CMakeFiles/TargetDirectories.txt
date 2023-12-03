@@ -1,3 +1,0 @@
-/home/cs18/GAMES101/homework/Final_Project/1_Displacement_with_loop/build/CMakeFiles/rebuild_cache.dir
-/home/cs18/GAMES101/homework/Final_Project/1_Displacement_with_loop/build/CMakeFiles/Rasterizer.dir
-/home/cs18/GAMES101/homework/Final_Project/1_Displacement_with_loop/build/CMakeFiles/edit_cache.dir

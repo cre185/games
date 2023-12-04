@@ -7,7 +7,6 @@
 
 constexpr double MY_PI = 3.1415926;
 
-Eigen::Vector4f view_rot = {0, 0, 0, 0};
 Eigen::Vector4f model_rot = {0, 0, 0, 0};
 
 float rot_sensitivity = 0.3f;
@@ -55,6 +54,28 @@ Eigen::Matrix4f rotate_matrix(Vector4f &angle){
     return x_rotate_matrix(angle[0])*y_rotate_matrix(angle[1])*z_rotate_matrix(angle[2]);
 }
 
+Eigen::Matrix4f get_rotation(Vector4f _axis, float angle)
+{
+    Eigen::Vector3f axis = _axis.head<3>();
+    Eigen::Matrix3f rodrigues_rotation = Eigen::Matrix3f::Identity();
+    Eigen::Matrix3f I = Eigen::Matrix3f::Identity();
+    float cos_angle = cos(angle / 180 * MY_PI);
+    float sin_angle = sin(angle / 180 * MY_PI);
+    Eigen::Matrix3f cross_vertex = Eigen::Matrix3f::Identity();
+    cross_vertex << 0, -axis.z(), axis.y(),
+                    axis.z(), 0, -axis.x(),
+                    -axis.y(), axis.x(), 0;
+
+    rodrigues_rotation = cos_angle * I + (1 - cos_angle) * axis * axis.transpose() + sin_angle * cross_vertex;
+    
+    Eigen::Matrix4f rotation = Eigen::Matrix4f::Identity();
+    rotation << rodrigues_rotation(0, 0), rodrigues_rotation(0, 1), rodrigues_rotation(0, 2), 0,
+                rodrigues_rotation(1, 0), rodrigues_rotation(1, 1), rodrigues_rotation(1, 2), 0,
+                rodrigues_rotation(2, 0), rodrigues_rotation(2, 1), rodrigues_rotation(2, 2), 0,
+                0, 0, 0, 1;
+    return rotation;
+}
+
 Eigen::Matrix4f get_model_matrix(Vector4f &angle)
 {
     /*
@@ -73,12 +94,11 @@ Eigen::Matrix4f get_model_matrix(Vector4f &angle)
     return rotate_matrix(angle);
 }
 
-Eigen::Matrix4f get_view_matrix(Vector4f &eye_pos, Vector4f &angle)
+Eigen::Matrix4f get_view_matrix(Vector4f &eye_pos)
 {
-    Eigen::Matrix4f all_rotation = rotate_matrix(angle);
-    Eigen::Vector4f a = all_rotation*right_dir;
-    Eigen::Vector4f b = all_rotation*up_dir;
-    Eigen::Vector4f c = all_rotation*eye_dir;
+    Eigen::Vector4f a = right_dir;
+    Eigen::Vector4f b = up_dir;
+    Eigen::Vector4f c = eye_dir;
     Eigen::Matrix4f view = Eigen::Matrix4f::Identity();
     view << a[0], a[1], a[2], 0,
             b[0], b[1], b[2], 0,
@@ -132,13 +152,16 @@ void on_Mouse(int event, int x, int y, int flags, void* param) {
     static int last_y = 0;
 	if (event == CV_EVENT_MOUSEMOVE){
         if(mouse_down){
-            // remind the difference between rotation using x axis and rotating in the x direction:
-            // rotate around x axis makes your view move upwards/downwards
-            float delta_y = (last_x-x)*rot_sensitivity;
-            float delta_x = (last_y-y)*rot_sensitivity;
-            Eigen::Matrix4f all_rotation = rotate_matrix(view_rot);
-            view_rot[0] += (all_rotation*right_dir*delta_x)[0];
-            view_rot[1] += (all_rotation*up_dir*delta_y)[1];
+            float delta_x = (last_x-x)*rot_sensitivity;
+            float delta_y = (last_y-y)*rot_sensitivity;
+            Eigen::Vector4f old_right_dir = right_dir;
+            right_dir = (get_rotation(up_dir, delta_x)*right_dir).normalized();
+            up_dir = (get_rotation(old_right_dir, delta_y)*up_dir).normalized();
+            Vector3f eye_dir3 = eye_dir.head<3>();
+            Vector3f right_dir3 = right_dir.head<3>();
+            Vector3f up_dir3 = up_dir.head<3>();
+            eye_dir3 = up_dir3.cross(right_dir3);
+            eye_dir << eye_dir3[0], eye_dir3[1], eye_dir3[2], 0;
             last_x=x;
             last_y=y;
         }
@@ -205,7 +228,7 @@ int main(int argc, const char** argv)
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
 
         r.set_model(get_model_matrix(model_rot));
-        r.set_view(get_view_matrix(eye_pos, view_rot));
+        r.set_view(get_view_matrix(eye_pos));
         r.set_projection(get_projection_matrix(45, 1, 0.1, 50));
 
         r.draw(pos_id, ind_id, col_id, rst::Primitive::Triangle);
@@ -223,7 +246,7 @@ int main(int argc, const char** argv)
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
 
         r.set_model(get_model_matrix(model_rot));
-        r.set_view(get_view_matrix(eye_pos, view_rot));
+        r.set_view(get_view_matrix(eye_pos));
         r.set_projection(get_projection_matrix(45, 1, 0.1, 50));
 
         r.draw(pos_id, ind_id, col_id, rst::Primitive::Triangle);
@@ -237,20 +260,16 @@ int main(int argc, const char** argv)
         key = cv::waitKey(10);
 
         if (key == 'w') {
-            Vector4f current_dir = rotate_matrix(view_rot)*eye_dir;
-            eye_pos += current_dir*mov_sensitivity;
+            eye_pos += eye_dir*mov_sensitivity;
         }
         else if (key == 's') {
-            Vector4f current_dir = rotate_matrix(view_rot)*eye_dir;
-            eye_pos -= current_dir*mov_sensitivity;
+            eye_pos -= eye_dir*mov_sensitivity;
         }
         else if (key == 'a') {
-            Vector4f current_dir = rotate_matrix(view_rot)*right_dir;
-            eye_pos -= current_dir*mov_sensitivity;
+            eye_pos -= right_dir*mov_sensitivity;
         }
         else if (key == 'd') {
-            Vector4f current_dir = rotate_matrix(view_rot)*right_dir;
-            eye_pos += current_dir*mov_sensitivity;
+            eye_pos += right_dir*mov_sensitivity;
         }
     }
     return 0;

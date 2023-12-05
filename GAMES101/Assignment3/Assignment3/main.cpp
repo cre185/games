@@ -8,29 +8,78 @@
 #include "Texture.hpp"
 #include "OBJ_Loader.h"
 
-Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos)
-{
-    Eigen::Matrix4f view = Eigen::Matrix4f::Identity();
+Eigen::Vector4f model_rot = {0, 140, 0, 0};
 
-    Eigen::Matrix4f translate;
-    translate << 1,0,0,-eye_pos[0],
-                 0,1,0,-eye_pos[1],
-                 0,0,1,-eye_pos[2],
-                 0,0,0,1;
+float rot_sensitivity = 0.3f;
+float mov_sensitivity = 0.3f;
 
-    view = translate*view;
+Eigen::Vector4f eye_pos = {0, 0, 10, 1};
+Eigen::Vector4f eye_dir = {0, 0, -1, 0}; // -z
+Eigen::Vector4f up_dir = {0, 1, 0, 0}; // y
+Eigen::Vector4f right_dir = {1, 0, 0, 0}; // x
 
-    return view;
+Eigen::Matrix4f x_rotate_matrix(float x_angle){
+    Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
+    float cos_angle = cos(x_angle / 180 * MY_PI);
+    float sin_angle = sin(x_angle / 180 * MY_PI);
+    model << 1, 0, 0, 0, 
+             0, cos_angle, -sin_angle, 0,
+             0, sin_angle, cos_angle, 0,
+             0, 0, 0, 1;
+    return model;
 }
 
-Eigen::Matrix4f get_model_matrix(float angle)
+Eigen::Matrix4f y_rotate_matrix(float y_angle){
+    Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
+    float cos_angle = cos(y_angle / 180 * MY_PI);
+    float sin_angle = sin(y_angle / 180 * MY_PI);
+    model << cos_angle, 0, sin_angle, 0, 
+             0, 1, 0, 0,
+             -sin_angle, 0, cos_angle, 0,
+             0, 0, 0, 1;
+    return model;
+}
+
+Eigen::Matrix4f z_rotate_matrix(float z_angle){
+    Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
+    float cos_angle = cos(z_angle / 180 * MY_PI);
+    float sin_angle = sin(z_angle / 180 * MY_PI);
+    model << cos_angle, -sin_angle, 0, 0, 
+             sin_angle, cos_angle, 0, 0,
+             0, 0, 1, 0,
+             0, 0, 0, 1;
+    return model;
+}
+
+Eigen::Matrix4f rotate_matrix(Vector4f &angle){
+    return x_rotate_matrix(angle[0])*y_rotate_matrix(angle[1])*z_rotate_matrix(angle[2]);
+}
+
+Eigen::Matrix4f get_rotation(Vector4f _axis, float angle)
 {
-    Eigen::Matrix4f rotation;
-    angle = angle * MY_PI / 180.f;
-    rotation << cos(angle), 0, sin(angle), 0,
-                0, 1, 0, 0,
-                -sin(angle), 0, cos(angle), 0,
+    Eigen::Vector3f axis = _axis.head<3>();
+    Eigen::Matrix3f rodrigues_rotation = Eigen::Matrix3f::Identity();
+    Eigen::Matrix3f I = Eigen::Matrix3f::Identity();
+    float cos_angle = cos(angle / 180 * MY_PI);
+    float sin_angle = sin(angle / 180 * MY_PI);
+    Eigen::Matrix3f cross_vertex = Eigen::Matrix3f::Identity();
+    cross_vertex << 0, -axis.z(), axis.y(),
+                    axis.z(), 0, -axis.x(),
+                    -axis.y(), axis.x(), 0;
+
+    rodrigues_rotation = cos_angle * I + (1 - cos_angle) * axis * axis.transpose() + sin_angle * cross_vertex;
+    
+    Eigen::Matrix4f rotation = Eigen::Matrix4f::Identity();
+    rotation << rodrigues_rotation(0, 0), rodrigues_rotation(0, 1), rodrigues_rotation(0, 2), 0,
+                rodrigues_rotation(1, 0), rodrigues_rotation(1, 1), rodrigues_rotation(1, 2), 0,
+                rodrigues_rotation(2, 0), rodrigues_rotation(2, 1), rodrigues_rotation(2, 2), 0,
                 0, 0, 0, 1;
+    return rotation;
+}
+
+Eigen::Matrix4f get_model_matrix(Vector4f &angle)
+{
+    Eigen::Matrix4f rotation = rotate_matrix(angle);
 
     Eigen::Matrix4f scale;
     scale << 2.5, 0, 0, 0,
@@ -45,6 +94,25 @@ Eigen::Matrix4f get_model_matrix(float angle)
             0, 0, 0, 1;
 
     return translate * rotation * scale;
+}
+
+Eigen::Matrix4f get_view_matrix(Vector4f &eye_pos)
+{
+    Eigen::Vector4f a = right_dir;
+    Eigen::Vector4f b = up_dir;
+    Eigen::Vector4f c = eye_dir;
+    Eigen::Matrix4f view = Eigen::Matrix4f::Identity();
+    view << a[0], a[1], a[2], 0,
+            b[0], b[1], b[2], 0,
+            -c[0], -c[1], -c[2], 0,
+            0, 0, 0, 1;
+    
+    Eigen::Matrix4f translate;
+    translate << 1, 0, 0, -eye_pos[0], 0, 1, 0, -eye_pos[1], 0, 0, 1,
+        -eye_pos[2], 0, 0, 0, 1;
+    
+    view = view * translate;
+    return view;
 }
 
 Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio, float zNear, float zFar)
@@ -128,8 +196,8 @@ Eigen::Vector3f texture_fragment_shader(const fragment_shader_payload& payload)
     Eigen::Vector3f eye_pos{0, 0, 10};
 
     float p = 150;
-
-    Eigen::Vector3f color = texture_color;
+    
+    Eigen::Vector3f color = payload.color;
     Eigen::Vector3f point = payload.view_pos;
     Eigen::Vector3f normal = payload.normal;
 
@@ -165,7 +233,7 @@ Eigen::Vector3f phong_fragment_shader(const fragment_shader_payload& payload)
 
     std::vector<light> lights = {l1, l2};
     Eigen::Vector3f amb_light_intensity{10, 10, 10};
-    Eigen::Vector3f eye_pos{0, 0, 10};
+    Eigen::Vector3f _eye_pos = eye_pos.head<3>();
 
     float p = 150;
 
@@ -179,7 +247,7 @@ Eigen::Vector3f phong_fragment_shader(const fragment_shader_payload& payload)
         // TODO: For each light source in the code, calculate what the *ambient*, *diffuse*, and *specular* 
         // components are. Then, accumulate that result on the *result_color* object.
         Eigen::Vector3f ambient = ka.cwiseProduct(amb_light_intensity);
-        auto v = (eye_pos-point).normalized();
+        auto v = (_eye_pos-point).normalized();
         auto l = light.position-point;
         auto l2 = l.dot(l);
         auto ln = l.normalized();
@@ -270,19 +338,12 @@ Eigen::Vector3f displacement_fragment_shader(const fragment_shader_payload& payl
 
 Eigen::Vector3f bump_fragment_shader(const fragment_shader_payload& payload)
 {
-    
-    Eigen::Vector3f ka = Eigen::Vector3f(0.005, 0.005, 0.005);
-    Eigen::Vector3f kd = payload.color;
-    Eigen::Vector3f ks = Eigen::Vector3f(0.7937, 0.7937, 0.7937);
-
     auto l1 = light{{20, 20, 20}, {500, 500, 500}};
     auto l2 = light{{-20, 20, 0}, {500, 500, 500}};
 
     std::vector<light> lights = {l1, l2};
     Eigen::Vector3f amb_light_intensity{10, 10, 10};
     Eigen::Vector3f eye_pos{0, 0, 10};
-
-    float p = 150;
 
     Eigen::Vector3f color = payload.color; 
     Eigen::Vector3f point = payload.view_pos;
@@ -320,11 +381,39 @@ Eigen::Vector3f bump_fragment_shader(const fragment_shader_payload& payload)
     return result_color * 255.f;
 }
 
+void on_Mouse(int event, int x, int y, int flags, void* param) {
+    static bool mouse_down=false;
+    static int last_x = 0;
+    static int last_y = 0;
+	if (event == CV_EVENT_MOUSEMOVE){
+        if(mouse_down){
+            float delta_x = (last_x-x)*rot_sensitivity;
+            float delta_y = (last_y-y)*rot_sensitivity;
+            Eigen::Vector4f old_right_dir = right_dir;
+            right_dir = (get_rotation(up_dir, delta_x)*right_dir).normalized();
+            up_dir = (get_rotation(old_right_dir, delta_y)*up_dir).normalized();
+            Vector3f eye_dir3 = eye_dir.head<3>();
+            Vector3f right_dir3 = right_dir.head<3>();
+            Vector3f up_dir3 = up_dir.head<3>();
+            eye_dir3 = up_dir3.cross(right_dir3).normalized();
+            eye_dir << eye_dir3[0], eye_dir3[1], eye_dir3[2], 0;
+            last_x=x;
+            last_y=y;
+        }
+    }
+    else if (event == CV_EVENT_LBUTTONDOWN){
+        mouse_down=true;
+        last_x=x;
+        last_y=y;
+    }
+    else if (event == CV_EVENT_LBUTTONUP){
+        mouse_down=false;
+    }
+}
+
 int main(int argc, const char** argv)
 {
     std::vector<Triangle*> TriangleList;
-
-    float angle = 140.0;
     bool command_line = false;
 
     std::string filename = "output.png";
@@ -332,7 +421,7 @@ int main(int argc, const char** argv)
     std::string obj_path = "../models/spot/";
 
     // Load .obj File
-    bool loadout = Loader.LoadFile("../models/spot/spot_triangulated_good.obj");
+    Loader.LoadFile("../models/spot/spot_triangulated_good.obj");
     for(auto mesh:Loader.LoadedMeshes)
     {
         for(int i=0;i<mesh.Vertices.size();i+=3)
@@ -389,18 +478,15 @@ int main(int argc, const char** argv)
         }
     }
 
-    Eigen::Vector3f eye_pos = {0,0,10};
-
     r.set_vertex_shader(vertex_shader);
     r.set_fragment_shader(active_shader);
 
     int key = 0;
-    int frame_count = 0;
 
     if (command_line)
     {
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
-        r.set_model(get_model_matrix(angle));
+        r.set_model(get_model_matrix(model_rot));
         r.set_view(get_view_matrix(eye_pos));
         r.set_projection(get_projection_matrix(45.0, 1, 0.1, 50));
 
@@ -417,8 +503,7 @@ int main(int argc, const char** argv)
     while(key != 27)
     {
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
-
-        r.set_model(get_model_matrix(angle));
+        r.set_model(get_model_matrix(model_rot));
         r.set_view(get_view_matrix(eye_pos));
         r.set_projection(get_projection_matrix(45.0, 1, 0.1, 50));
 
@@ -427,22 +512,23 @@ int main(int argc, const char** argv)
         cv::Mat image(700, 700, CV_32FC3, r.frame_buffer().data());
         image.convertTo(image, CV_8UC3, 1.0f);
         cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
-
+        cv::namedWindow("image");
+        cv::setMouseCallback("image", on_Mouse);
         cv::imshow("image", image);
-        cv::imwrite(filename, image);
         key = cv::waitKey(10);
 
-        std::cout << "frame count: " << frame_count++ << '\n';
-
-        if (key == 'a' )
-        {
-            angle -= 5;
+        if (key == 'w') {
+            eye_pos += eye_dir*mov_sensitivity;
         }
-        else if (key == 'd')
-        {
-            angle += 5;
+        else if (key == 's') {
+            eye_pos -= eye_dir*mov_sensitivity;
         }
-
+        else if (key == 'a') {
+            eye_pos -= right_dir*mov_sensitivity;
+        }
+        else if (key == 'd') {
+            eye_pos += right_dir*mov_sensitivity;
+        }
     }
     return 0;
 }

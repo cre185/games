@@ -4,7 +4,6 @@ project(Rasterizer)
 find_package(OpenCV REQUIRED)
 
 set(CMAKE_CXX_STANDARD 17)
-add_compile_options(-g)
 SET(CMAKE_CXX_FLAGS " -O3 -Wall -g")
 
 include_directories(/usr/local/include)

@@ -135,17 +135,14 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
     int y_min = std::floor(std::min(v[0].y(),std::min(v[1].y(),v[2].y())));
     int y_max = std::ceil(std::max(v[0].y(),std::max(v[1].y(),v[2].y())));
     // Exclude triangles out of the screen
-    if((x_max<0 || x_min>width) || (y_max<0 || y_min>height)){
-        return;
-    }
     x_min=std::max(x_min, 0);
     x_max=std::min(x_max, width);
     y_min=std::max(y_min, 0);
-    y_max=std::min(y_max, width);
+    y_max=std::min(y_max, height);
     // iterate through the pixel and find if the current pixel is inside the triangle
-    for(int x = x_min;x<x_max && x<width;x++)
+    for(int x = x_min;x<x_max;x++)
     {
-        for(int y = y_min;y<y_max && y<height;y++)
+        for(int y = y_min;y<y_max;y++)
         {
             if(insideTriangle(x,y,t.v)){
                 auto[alpha, beta, gamma] = computeBarycentric2D(x, y, t.v);
